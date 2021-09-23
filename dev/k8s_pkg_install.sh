@@ -77,18 +77,46 @@ if [[ $HOSTNAME =~ "master" ]]; then
     cert_hash=${t%% *}
     echo "    caCertHashes: [\"$cert_hash\"]" >&3
 
+    # install the calico CNI plugin
+    gsutil cp gs://platform-infrastructure/calico.yaml .
+    mkdir -p $HOME/.kube
+    sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+    sudo chown $(id -u):$(id -g) $HOME/.kube/config
+    knodes=$(kubectl get nodes)
+    if [[ $knodes =~ $HOSTNAME ]]; then
+      echo "Able to get nodes"
+      kubectl apply -f calico.yaml
+      echo "calico install done"
+    else
+      echo "Unable to get nodes"
+      exit 1
+    fi
+
+    # wait for time for the node to get ready
+    # ideally we should poll every second
+    sleep 10
+
+    knodes=$(kubectl get nodes)
+    if [[ $knodes =~ Ready ]]; then
+      echo "Node is ready!"
+      gsutil cp $HOME/.kube/config gs://platform-infrastructure/kubeconfig
+      echo "Config file copied!"
+    else
+      echo "Node is not ready"
+      exit 1
+    fi
+
+    # capture the output, and write the parameters to a bucket
     # write the incremental file to the bucket
     cat <&4 | gsutil cp - gs://platform-infrastructure/kubeadm_extra.yaml
 
-
-    # install the calico CNI plugin
-    # capture the output, and write the parameters to a bucket
-
     echo "$host: master init done"
+
   else
     echo "Error: master init error"
     exit 1
   fi
+
 else
 
   # on the worker nodes, wait for the parameters on the bucket
