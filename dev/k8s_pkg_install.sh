@@ -145,5 +145,5 @@ else
 fi
 
 # create a file to show that the startup was completed
-touch /etc/startup_was_launched
+sudo touch /etc/startup_was_launched
 
