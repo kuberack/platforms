@@ -3,6 +3,10 @@
 # Run only at create time
 if [[ -f /etc/startup_was_launched ]]; then exit 0; fi
 
+# Setup the hugepages
+sudo sysctl -w vm.nr_hugepages=512
+echo "vm.nr_hugepages=512" | sudo tee -a /etc/sysctl.conf
+
 # Install the runtime
 sudo apt-get update 
 sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common gnupg2
