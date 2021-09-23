@@ -1,0 +1,32 @@
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: InitConfiguration
+nodeRegistration:
+  kubeletExtraArgs:
+    cloud-provider: "gce"
+---
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: ClusterConfiguration
+kubernetesVersion: v1.22.2
+clusterName: kubernetes
+certificatesDir: /etc/kubernetes/pki
+imageRepository: k8s.gcr.io
+apiServer:
+  certSANs:
+  - localhost
+  extraArgs:
+    cloud-provider: "gce"
+    authorization-mode: Node,RBAC
+  timeoutForControlPlane: 4m0s
+controllerManager:
+  extraArgs:
+    cloud-provider: "gce"
+dns:
+  type: CoreDNS
+etcd:
+  local:
+    dataDir: /var/lib/etcd
+networking:
+  dnsDomain: cluster.local
+  podSubnet: 10.244.0.0/16
+  serviceSubnet: 10.96.0.0/12
+scheduler: {}
