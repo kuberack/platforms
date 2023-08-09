@@ -1,15 +1,15 @@
-apiVersion: kubeadm.k8s.io/v1beta2
+apiVersion: kubeadm.k8s.io/v1beta3
 kind: InitConfiguration
 nodeRegistration:
   kubeletExtraArgs:
     cloud-provider: "gce"
 ---
-apiVersion: kubeadm.k8s.io/v1beta2
+apiVersion: kubeadm.k8s.io/v1beta3
 kind: ClusterConfiguration
-kubernetesVersion: v1.22.2
+kubernetesVersion: v1.27.4
 clusterName: kubernetes
 certificatesDir: /etc/kubernetes/pki
-imageRepository: k8s.gcr.io
+imageRepository: registry.k8s.io
 apiServer:
   certSANs:
   - localhost
@@ -20,8 +20,6 @@ apiServer:
 controllerManager:
   extraArgs:
     cloud-provider: "gce"
-dns:
-  type: CoreDNS
 etcd:
   local:
     dataDir: /var/lib/etcd
