@@ -31,7 +31,7 @@ sudo sysctl --system
 sudo apt-get update 
 sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common gnupg2
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+sudo add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 sudo apt-get update 
 sudo apt-get install containerd.io -y
 sudo mkdir -p /etc/containerd
@@ -39,7 +39,8 @@ sudo mkdir -p /etc/containerd
 # Configure the runtime
 sudo containerd config default | sudo tee /etc/containerd/config.toml
 sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
-sudo sed -i 's/registry.k8s.io\/pause:3.6/k8s.gcr.io\/pause:3.9/g' /etc/containerd/config.toml
+sudo sed -i 's/k8s.gcr.io/registry.k8s.io/g' /etc/containerd/config.toml
+sudo sed -i 's/pause:3.6/pause:3.9/g' /etc/containerd/config.toml
 
 # Restart the daemons
 sudo systemctl restart containerd
