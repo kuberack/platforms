@@ -1,5 +1,11 @@
 #!/bin/bash
 
+###################
+# Utility Functions
+###################
+
+# Check if the vm is created successfully
+# $1 = vm name
 check_vm_creation () {
     # check if the VM is created, and running
     declare result=$(gcloud compute instances describe $1 --format="json(name, status)" 2>&1)
@@ -45,6 +51,8 @@ check_vm_creation () {
 }
 
 # retry function
+# $1 command to be executed
+# $2 parameter to the command
 retry_command () {
     # Set the maximum number of attempts
     max_attempts=5
@@ -69,6 +77,8 @@ retry_command () {
         echo "Attempt $attempt_num failed. Trying again..."
         # Increment the attempt counter
         attempt_num=$(( attempt_num + 1 ))
+	# delay
+	sleep 10
       fi
     done
     
@@ -84,13 +94,49 @@ retry_command () {
     fi
 }
 
-# create the master VM
-gcloud compute instances create k8s-master --project=virtual-lab-1 --zone=us-central1-a --machine-type=n1-standard-2 --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=default --can-ip-forward --no-restart-on-failure --maintenance-policy=TERMINATE --provisioning-model=SPOT --instance-termination-action=STOP --service-account=228483067154-compute@developer.gserviceaccount.com --scopes=https://www.googleapis.com/auth/cloud-platform --tags=ipip-peer --create-disk=auto-delete=yes,boot=yes,device-name=k8s-master,image=projects/ubuntu-os-cloud/global/images/ubuntu-2204-jammy-v20230727,mode=rw,size=100,type=projects/virtual-lab-1/zones/us-central1-a/diskTypes/pd-standard --no-shielded-secure-boot --shielded-vtpm --shielded-integrity-monitoring --labels=goog-ec-src=vm_add-gcloud --reservation-affinity=any
 
-# create the worker VM
-gcloud compute instances create instance-1 --project=virtual-lab-1 --zone=us-central1-a --machine-type=n1-standard-1 --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=default --can-ip-forward --no-restart-on-failure --maintenance-policy=TERMINATE --provisioning-model=SPOT --instance-termination-action=STOP --service-account=228483067154-compute@developer.gserviceaccount.com --scopes=https://www.googleapis.com/auth/cloud-platform --tags=ipip-peer --create-disk=auto-delete=yes,boot=yes,device-name=k8s-master,image=projects/ubuntu-os-cloud/global/images/ubuntu-2204-jammy-v20230727,mode=rw,size=100,type=projects/virtual-lab-1/zones/us-central1-a/diskTypes/pd-standard --no-shielded-secure-boot --shielded-vtpm --shielded-integrity-monitoring --labels=goog-ec-src=vm_add-gcloud --reservation-affinity=any
+# get the instance ip 
+# $1 = vm name
+get_instance_ip () {
+    result=$(gcloud compute instances describe $1 --format="json(networkInterfaces[0].accessConfigs[0].natIP)")
+    ip=$(echo $result | jq .networkInterfaces[0].accessConfigs[0].natIP | tr -d '"')
+    echo $ip
+}
+
+
+# copy file to remote, and execute script
+# $1 = vm name
+bringup_k8s () {
+    ip=$(get_instance_ip $1)
+    scp k8s_pkg_install.sh shivkb@$ip:
+    ssh -i ~/.ssh/shivkube_gcp shivkb@$ip ./k8s_pkg_install.sh
+}
+
+# create the VMs
+# $1 = name
+# $2 = vm type
+create_vm () {
+    gcloud compute instances create $1 --project=virtual-lab-1 --zone=us-central1-a --machine-type=$2 --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=default --can-ip-forward --no-restart-on-failure --maintenance-policy=TERMINATE --provisioning-model=SPOT --instance-termination-action=STOP --service-account=228483067154-compute@developer.gserviceaccount.com --scopes=https://www.googleapis.com/auth/cloud-platform --tags=ipip-peer --create-disk=auto-delete=yes,boot=yes,device-name=k8s-master,image=projects/ubuntu-os-cloud/global/images/ubuntu-2204-jammy-v20230727,mode=rw,size=100,type=projects/virtual-lab-1/zones/us-central1-a/diskTypes/pd-standard --no-shielded-secure-boot --shielded-vtpm --shielded-integrity-monitoring --labels=goog-ec-src=vm_add-gcloud --reservation-affinity=any
+}
+
+
+###################
+# Main Script
+###################
+
+
+# create the vms
+echo "Creating VMs"
+create_vm k8s-master n1-standard-2
+create_vm instance-1 n1-standard-1
 
 # check if the VMs are created
+echo "Checking if VMs are created"
 retry_command check_vm_creation k8s-master
 retry_command check_vm_creation instance-1
+
+# bringup k8s on the master first, and then instance 1
+echo "Bringing up kubernetes on the nodes"
+bringup_k8s k8s-master
+bringup_k8s instance-1
 
