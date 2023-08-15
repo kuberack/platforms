@@ -1,6 +1,18 @@
 #!/bin/bash
 
 ###################
+# Dependencies
+###################
+# ssh key ~/.ssh/shivkube_gcp is to be setup in the GCP project metadata
+# gcloud is installed
+# jq is installed
+# yq is installed
+# kubeadm*.yaml, calico yaml present in below location in cloud storage bucket
+#   - gs://platform-infrastructure/kubeadm_*.yaml
+#   - gs://platform-infrastructure/calico.yaml
+
+
+###################
 # Utility Functions
 ###################
 
@@ -140,3 +152,8 @@ echo "Bringing up kubernetes on the nodes"
 bringup_k8s k8s-master
 bringup_k8s instance-1
 
+# Setup the kubeconfig file
+ip=$(get_instance_ip k8s-master)
+scp shivkb@$ip:.kube/config /home/hima/.kube/config
+yq  -i '.clusters[0].cluster.server="https://localhost:2222"' ~/.kube/config
+echo "ssh -i ~/.ssh/shivkube_gcp shivkb@$ip -L 2222:localhost:6443"
