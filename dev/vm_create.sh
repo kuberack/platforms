@@ -3,13 +3,27 @@
 ###################
 # Dependencies
 ###################
+#
 # ssh key ~/.ssh/shivkube_gcp is to be setup in the GCP project metadata
 # gcloud is installed
 # jq is installed
 # yq is installed
+#
 # kubeadm*.yaml, calico yaml present in below location in cloud storage bucket
 #   - gs://platform-infrastructure/kubeadm_*.yaml
 #   - gs://platform-infrastructure/calico.yaml
+#
+# A firewall rule to enable IPIP traffic is added in project
+#   - Firewall rule name : default-allow-ipip
+#     Network            : default
+#     Priority           : 1000
+#     Direction          : Ingress
+#     Action on match    : Allow
+#     Target tags        : ipip-peer
+#     Source filters
+#     IP ranges          : 0.0.0.0/0
+#     Protocols and ports: ipip
+
 
 
 ###################
@@ -120,8 +134,8 @@ get_instance_ip () {
 # $1 = vm name
 bringup_k8s () {
     ip=$(get_instance_ip $1)
-    scp k8s_pkg_install.sh shivkb@$ip:
-    ssh -i ~/.ssh/shivkube_gcp shivkb@$ip ./k8s_pkg_install.sh
+    scp -o "UserKnownHostsFile=/dev/null" k8s_pkg_install.sh shivkb@$ip:
+    ssh -o "UserKnownHostsFile=/dev/null" -i ~/.ssh/shivkube_gcp shivkb@$ip ./k8s_pkg_install.sh
 }
 
 # create the VMs
