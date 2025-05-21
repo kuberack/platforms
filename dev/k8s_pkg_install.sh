@@ -14,7 +14,7 @@ overlay
 br_netfilter
 EOF
 
-sudo overlay
+sudo modprobe overlay
 sudo modprobe br_netfilter
 
 # sysctl params required by setup, params persist across reboots
@@ -30,8 +30,13 @@ sudo sysctl --system
 # Install the runtime
 sudo apt-get update 
 sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common gnupg2
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-sudo add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update 
 sudo apt-get install containerd.io -y
 sudo mkdir -p /etc/containerd
@@ -40,23 +45,23 @@ sudo mkdir -p /etc/containerd
 sudo containerd config default | sudo tee /etc/containerd/config.toml
 sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
 sudo sed -i 's/k8s.gcr.io/registry.k8s.io/g' /etc/containerd/config.toml
-sudo sed -i 's/pause:3.6/pause:3.9/g' /etc/containerd/config.toml
+sudo sed -i 's/pause:3.8/pause:3.10/g' /etc/containerd/config.toml
 
 # Restart the daemons
 sudo systemctl restart containerd
 
 # Install the kubelet, kubeadm, and kubectl
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
-deb https://apt.kubernetes.io/ kubernetes-xenial main
-EOF
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.33/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+sudo chmod 644 /etc/apt/keyrings/kubernetes-apt-keyring.gpg # allow unprivileged APT programs to read this keyring
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.33/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+sudo chmod 644 /etc/apt/sources.list.d/kubernetes.list   # helps tools such as command-not-found to work correctly
 sudo apt-get update 
 sudo apt-get install -y kubelet kubeadm kubectl 
 sudo apt-mark hold kubelet kubeadm kubectl 
 
 cat <<EOF | sudo tee /etc/systemd/system/kubelet.service.d/09-extra-args.conf
 [Service]
-Environment="KUBELET_EXTRA_ARGS=--cloud-provider=gce"
+Environment="KUBELET_EXTRA_ARGS=--cloud-provider=external"
 EOF
 
 # get the kubeadm_* files from the bucket

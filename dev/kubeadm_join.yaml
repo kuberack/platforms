@@ -1,7 +1,8 @@
-apiVersion: kubeadm.k8s.io/v1beta3
+apiVersion: kubeadm.k8s.io/v1beta4
 kind: JoinConfiguration
 nodeRegistration:
   kubeletExtraArgs:
-    cloud-provider: "gce"
+    - name: cloud-provider:
+      value: "external"
 discovery:
   bootstrapToken:

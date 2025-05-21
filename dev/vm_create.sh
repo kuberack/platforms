@@ -10,8 +10,11 @@
 # yq is installed
 #
 # kubeadm*.yaml, calico yaml present in below location in cloud storage bucket
-#   - gs://platform-infrastructure/kubeadm_*.yaml
-#   - gs://platform-infrastructure/calico.yaml
+#   - gcloud auth login
+#   - gcloud config set project tubify-438815
+#   - create the cloud bucket platform-infrastructure
+#   - gsutil cp kubeadm_*.yaml gs://platform-infrastructure/
+#   - gsutil cp calico.yaml gs://platform-infrastructure/
 #
 # A firewall rule to enable IPIP traffic is added in project
 #   - Firewall rule name : default-allow-ipip
@@ -140,9 +143,12 @@ bringup_k8s () {
 
 # create the VMs
 # $1 = name
-# $2 = vm type
+# $2 = project
+# $3 = vm type
+# $4 = service account name
+# $5 = image name
 create_vm () {
-    gcloud compute instances create $1 --project=virtual-lab-1 --zone=us-central1-a --machine-type=$2 --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=default --can-ip-forward --no-restart-on-failure --maintenance-policy=TERMINATE --provisioning-model=SPOT --instance-termination-action=STOP --service-account=228483067154-compute@developer.gserviceaccount.com --scopes=https://www.googleapis.com/auth/cloud-platform --tags=ipip-peer --create-disk=auto-delete=yes,boot=yes,device-name=k8s-master,image=projects/ubuntu-os-cloud/global/images/ubuntu-2204-jammy-v20230727,mode=rw,size=100,type=projects/virtual-lab-1/zones/us-central1-a/diskTypes/pd-standard --no-shielded-secure-boot --shielded-vtpm --shielded-integrity-monitoring --labels=goog-ec-src=vm_add-gcloud --reservation-affinity=any
+gcloud compute instances create $1 --project=$2 --zone=us-central1-a --machine-type=$3 --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=default --can-ip-forward --no-restart-on-failure --maintenance-policy=TERMINATE --provisioning-model=SPOT --instance-termination-action=STOP --service-account=$4@developer.gserviceaccount.com --scopes=https://www.googleapis.com/auth/cloud-platform --tags=ipip-peer --create-disk=auto-delete=yes,boot=yes,device-name=$1,image=projects/ubuntu-os-cloud/global/images/$5,mode=rw,size=100,type=projects/$2/zones/us-central1-a/diskTypes/pd-standard --no-shielded-secure-boot --shielded-vtpm --shielded-integrity-monitoring --labels=goog-ec-src=vm_add-gcloud --reservation-affinity=any
 }
 
 
@@ -152,9 +158,12 @@ create_vm () {
 
 
 # create the vms
+pr=tubify-438815
+sa=753257145360-compute 
+im=ubuntu-minimal-2204-jammy-v20250520
 echo "Creating VMs"
-create_vm k8s-master n1-standard-2
-create_vm instance-1 n1-standard-1
+create_vm k8s-master tubify-438815 n1-standard-2 $sa $im
+create_vm instance-1 tubify-438815 n1-standard-1 $sa $im
 
 # check if the VMs are created
 echo "Checking if VMs are created"
