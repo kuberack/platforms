@@ -2,7 +2,7 @@ apiVersion: kubeadm.k8s.io/v1beta4
 kind: JoinConfiguration
 nodeRegistration:
   kubeletExtraArgs:
-    - name: cloud-provider:
+    - name: cloud-provider
       value: "external"
 discovery:
   bootstrapToken:
