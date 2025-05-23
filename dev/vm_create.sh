@@ -15,6 +15,7 @@
 #   - create the cloud bucket platform-infrastructure
 #   - gsutil cp kubeadm_*.yaml gs://platform-infrastructure/
 #   - gsutil cp calico.yaml gs://platform-infrastructure/
+#   - gsutil cp cloud_controller_manager.yaml gs://platform-infrastructure/
 #
 # A firewall rule to enable IPIP traffic is added in project
 #   - Firewall rule name : default-allow-ipip
