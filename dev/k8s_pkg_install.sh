@@ -101,11 +101,23 @@ if [[ $HOSTNAME =~ "master" ]]; then
     cert_hash=${t%% *}
     echo "    caCertHashes: [\"$cert_hash\"]" >&3
 
-    # install the calico CNI plugin
+    # install the calico CNI plugin, and the cloud controller
+    gsutil cp gs://platform-infrastructure/cloud_controller_manager.yaml .
     gsutil cp gs://platform-infrastructure/calico.yaml .
     mkdir -p $HOME/.kube
     sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
     sudo chown $(id -u):$(id -g) $HOME/.kube/config
+    knodes=$(kubectl get nodes)
+    if [[ $knodes =~ $HOSTNAME ]]; then
+      echo "Able to get nodes"
+      kubectl apply -f cloud_controller_manager.yaml
+      echo "cloud controller manager install done"
+    else
+      echo "Unable to get nodes"
+      exit 1
+    fi
+
+    # Not sure about how to check if cloud controller is installed successfully
     knodes=$(kubectl get nodes)
     if [[ $knodes =~ $HOSTNAME ]]; then
       echo "Able to get nodes"
