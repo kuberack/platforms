@@ -17,6 +17,11 @@
 #   - gsutil cp calico.yaml gs://platform-infrastructure/
 #   - gsutil cp cloud_controller_manager.yaml gs://platform-infrastructure/
 #   - Enable cloudresourcemanager.googleapis.com for the project
+#   - Once all the nodes are up, we need to manually remove the taint 
+#     from instance-1 node. This is because the taint is added by the
+#     kubeadm_join.yaml (cloud provider is external) on the worker
+#     node, and the cloud controller manager daemonset which is 
+#     supposed to remove the taint runs only on the master
 #
 # A firewall rule to enable IPIP traffic is added in project
 #   - Firewall rule name : default-allow-ipip
