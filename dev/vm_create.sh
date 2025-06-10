@@ -172,22 +172,22 @@ im=ubuntu-minimal-2204-jammy-v20250530
 echo "Creating VMs"
 create_vm k8s-master tubify-438815 n1-standard-2 $sa $im
 create_vm instance-1 tubify-438815 n1-standard-1 $sa $im
-create_vm instance-2 tubify-438815 n1-standard-2 $sa $im
-create_vm instance-3 tubify-438815 n1-standard-3 $sa $im
+# create_vm instance-2 tubify-438815 n1-standard-2 $sa $im
+# create_vm instance-3 tubify-438815 n1-standard-3 $sa $im
 
 # check if the VMs are created
 echo "Checking if VMs are created"
 retry_command check_vm_creation k8s-master
 retry_command check_vm_creation instance-1
-retry_command check_vm_creation instance-2
-retry_command check_vm_creation instance-3
+# retry_command check_vm_creation instance-2
+# retry_command check_vm_creation instance-3
 
 # bringup k8s on the master first, and then instance 1
 echo "Bringing up kubernetes on the nodes"
 bringup_k8s k8s-master
 bringup_k8s instance-1
-bringup_k8s instance-2
-bringup_k8s instance-3
+# bringup_k8s instance-2
+# bringup_k8s instance-3
 
 # Setup the kubeconfig file
 ip=$(get_instance_ip k8s-master)

@@ -7,6 +7,7 @@ Install gce pd csi driver:
    - compute, cloud storage, iam for the project. Not sure if this is
      enough
    - gcloud iam service-accounts keys create ./cloud-sa.json --iam-account 753257145360-compute@developer.gserviceaccount.com --project tubify-438815
+   - export GCE_PD_SA_DIR=/home/hima/repos/kuberack/platforms/dev/
    - Edit the deploy-driver.sh to generate the yaml file, and not to
      apply the yaml file
        cp $tmp_spec ./tmp.yaml
@@ -16,6 +17,11 @@ Install gce pd csi driver:
      toleration.
        --       tolerations:
        --       - operator: Exists
+   - Apply tmp.yaml
+     $ kgp -n gce-pd-csi-driver
+     NAME                                     READY   STATUS    RESTARTS   AGE
+     csi-gce-pd-controller-6545bd95f7-hlznl   5/5     Running   0          26s
+     csi-gce-pd-node-4wjln                    2/2     Running   0          25s
 
 
 Install Vitesse Operator
@@ -28,6 +34,33 @@ Install Vitesse Operator
  - operator.yaml
    - Add the storage class to the volumeClaimTemplate
    - 101...yaml
+
+ClusterAPI
+==========
+ - Ref 1: https://cluster-api.sigs.k8s.io/user/quick-start-operator
+   Ref 2: https://cluster-api-gcp.sigs.k8s.io/quick-start
+   Ref 3: https://cluster-api-gcp.sigs.k8s.io/prerequisites
+
+ - Service Account needs Editor permission
+ - Generate a JSON Key for service account and store it 
+
+ - [1] Add CAPI operator, and cert manager repository
+   - helm repo add capi-operator https://kubernetes-sigs.github.io/cluster-api-operator
+   - helm repo add jetstack https://charts.jetstack.io --force-update
+   - helm repo update
+
+ - [1] Install cert manager
+   - helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --set installCRDs=true
+
+ - [1] Deploy cluster API components with docker provider
+   - helm install capi-operator capi-operator/cluster-api-operator --create-namespace -n capi-operator-system --set infrastructure.gcp.enabled=true --set cert-manager.enabled=true --set configSecret.name=${CREDENTIALS_SECRET_NAME} --set configSecret.namespace=${CREDENTIALS_SECRET_NAMESPACE}  --wait --timeout 90s
+
+ - [2] kubectl apply -f capg.yaml
+
+ - [2] Install the clusterctl binary
+
+
+
 
 
 Taxi booking app
