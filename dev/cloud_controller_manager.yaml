@@ -53,7 +53,8 @@ spec:
       - name: cloud-controller-manager
         # for in-tree providers we use registry.k8s.io/cloud-controller-manager
         # this can be replaced with any other image for out-of-tree providers
-        image: registry.k8s.io/cloud-controller-manager:v1.8.0
+        # image: registry.k8s.io/cloud-controller-manager:v1.15.9
+        image: k8scloudprovidergcp/cloud-controller-manager:latest
         command:
         - /usr/local/bin/cloud-controller-manager
         - --cloud-provider=gce  # Add your own cloud provider here!
@@ -63,6 +64,7 @@ spec:
         # - --allocate-node-cidrs=true
         # - --configure-cloud-routes=true
         # - --cluster-cidr=172.17.0.0/16
+        - --v=4
       tolerations:
       # this is required so CCM can bootstrap itself
       - key: node.cloudprovider.kubernetes.io/uninitialized

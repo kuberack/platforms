@@ -24,6 +24,12 @@ Install gce pd csi driver:
      csi-gce-pd-node-4wjln                    2/2     Running   0          25s
 
 
+Install nginx-ingress and cert-manager
+======================================
+Ref: https://cert-manager.io/docs/tutorials/acme/nginx-ingress/
+
+
+
 Install Vitesse Operator
 ========================
  - Ref: https://vitess.io/docs/22.0/get-started/operator/
