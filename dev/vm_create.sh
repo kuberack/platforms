@@ -23,6 +23,10 @@
 #     node, and the cloud controller manager daemonset which is 
 #     supposed to remove the taint runs only on the master
 #     kubectl taint nodes instance-1 node.cloudprovider.kubernetes.io/uninitialized:NoSchedule-
+#   - We need to manually add tags to the nodes. Else we get 
+#     error "failed to ensure Load balancer"..
+#     - gcloud compute instances add-tags k8s-master --tags=k8s-master
+#     - gcloud compute instances add-tags instance-1 --tags=instance-1
 #
 # A firewall rule to enable IPIP traffic is added in project
 #   - Firewall rule name : default-allow-ipip
