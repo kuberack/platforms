@@ -3,7 +3,7 @@
 
 - Copy the kubeadm_init.yaml, kubeadm_join  files to the cloud storage 
   bucket either using browser or below command
-  - gsutil cp kubeadm_init.yaml gs://platform-infrastructure/
+  - gcloud storage cp kubeadm_init.yaml gs://platform-infrastructure/
 
 - Create the master and worker VMs using browser as per the course install 
   module

@@ -47,7 +47,7 @@ Backend Service	gcloud compute backend-services delete [BACKEND_SERVICE]
 Health Check	gcloud compute health-checks delete [HEALTH_CHECK]
 Static IP	gcloud compute addresses delete [IP_ADDRESS]
 
-Install OAuth2 proxy
+Install OAuth4 proxy
 ====================
  - Ref: https://kubernetes.github.io/ingress-nginx/examples/auth/oauth-external-auth/
  - kubectl apply -f kuard_ingress.yaml // kuard_ingress is modified to redirect to oauth endpoints. Also ingress rule is modified to be exact
