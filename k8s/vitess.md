@@ -47,7 +47,7 @@ Backend Service	gcloud compute backend-services delete [BACKEND_SERVICE]
 Health Check	gcloud compute health-checks delete [HEALTH_CHECK]
 Static IP	gcloud compute addresses delete [IP_ADDRESS]
 
-Install OAuth4 proxy
+Install OAuth2 proxy
 ====================
  - Ref: https://kubernetes.github.io/ingress-nginx/examples/auth/oauth-external-auth/
  - kubectl apply -f kuard_ingress.yaml // kuard_ingress is modified to redirect to oauth endpoints. Also ingress rule is modified to be exact
@@ -78,7 +78,7 @@ Install gce pd csi driver:
      csi-gce-pd-node-4wjln                    2/2     Running   0          25s
 
 
-Install Vitesse Operator
+Install Vitess Operator
 ========================
  - Ref: https://vitess.io/docs/22.0/get-started/operator/
         https://github.com/planetscale/vitess-operator/blob/main/docs/gcp-quickstart.md
