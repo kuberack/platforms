@@ -1,7 +1,7 @@
 
 # Install gce pd csi driver:
 
-##  Ref: // https://github.com/kubernetes-sigs/gcp-compute-persistent-disk-csi-driver/blob/master/docs/kubernetes/user-guides/driver-install.md
+Ref: // https://github.com/kubernetes-sigs/gcp-compute-persistent-disk-csi-driver/blob/master/docs/kubernetes/user-guides/driver-install.md
 
 ## Steps
  - Install git, golang
