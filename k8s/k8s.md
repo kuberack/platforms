@@ -38,13 +38,15 @@
 
  - A firewall rule to enable IPIP traffic is added in project. This
    is for the calico CNI plugin.
-   Firewall rule name : default-allow-ipip
-   Network            : default
-   Priority           : 1000
-   Direction          : Ingress
-   Action on match    : Allow
-   Target tags        : ipip-peer
-   Source filters
-   IP ranges          : 0.0.0.0/0
-   Protocols and ports: ipip
 
+   | Firewall rule name | default-allow-ipip  |
+   |--------------------|---------------------|
+   | Network            | default             |
+   | Priority           | 1000                |
+   | Direction          | Ingress             |
+   | Action on match    | Allow               |
+   | Target tags        | ipip-peer           |
+   | Source filters     |                     |
+   | IP ranges          | 0.0.0.0/0           |
+   | Protocols and ports| ipip                |
+                                            
