@@ -1,22 +1,11 @@
 # platforms
-- Contains scripts, manifests to install container runtime, and other kubernetes packages
+Contains scripts, manifests to setup a generic k8s based platform. This platform consists of a base k8s cluster and other extensions, controllers for proxies, identity, persistent storage, databases and observability. Applications such as [taxify](https://github.com/kuberack/taxify) can use this generic platform.
 
-- Copy the kubeadm_init.yaml, kubeadm_join  files to the cloud storage 
-  bucket either using browser or below command
-  - gcloud storage cp kubeadm_init.yaml gs://platform-infrastructure/
-
-- Create the master and worker VMs using browser as per the course install 
-  module
-
-- Copy the k8s_pkg_install.sh to the master VM, and run the script to bring
-  up the master
-  - This will generate two files - kubeadm_extra.yaml, kubeconfig - in the 
-    cloud storage bucket
-  - kubeadm_extra.yaml contains information about the API server endpoint 
-    which the worker node installation requires
-  - kubeconfig is required by kubectl, and other clients, to access the API
-    server
-
-- Once the master is up, copy the k8s_pkg_install.sh to the worker VMs, and
-  run the script to bring up the workers
+ - [Setup base k8s and controller manager](k8s/k8s.md)
+ - [Setup ingress and cert-manager](cert-manager/cert-manager.md)
+ - [Setup and OAuth2 proxy](oauth2-proxy/oauth2.md)
+ - [Setup the gce pd CSI driver](gce-pd-csi/gce-pd.md)
+ - [WIP - Setup vitess](vitess/vitess.md)
+ - [WIP - Use cluster API to setup k8s cluster](capi/capi.md)
+ - TODO - CD (Argo), configuration and secrets, observability
 
