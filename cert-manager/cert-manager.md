@@ -21,7 +21,7 @@ Ref: https://cert-manager.io/docs/tutorials/acme/nginx-ingress/
    NAME                                            TYPE           CLUSTER-IP     EXTERNAL-IP   PORT(S)                      AGE
    ...
    quickstart-ingress-nginx-controller             LoadBalancer   10.107.132.69   34.58.216.38   80:32534/TCP,443:30374/TCP   13m
-quickstart-ingress-nginx-controller-admission   ClusterIP      10.104.243.97   <none>         443/TCP                      13m
+   quickstart-ingress-nginx-controller-admission   ClusterIP      10.104.243.97   <none>         443/TCP                      13m
    ```
  - Add two lines to the config map of the ingress controller to disable 
    strict-validate-path-type. This is needed because the HTTP challenge 
