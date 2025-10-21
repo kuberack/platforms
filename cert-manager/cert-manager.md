@@ -33,7 +33,7 @@ Ref: https://cert-manager.io/docs/tutorials/acme/nginx-ingress/
    $ kubectl rollout restart deployment quickstart-ingress-nginx-controller
    ```
  - Add the dns entry for the load balancer ip address 
-   ![dns-ip](https://github.com/kuberack/platforms/cert-manager/dns-ip.png  "dns ip entry")
+   ![dns-ip](https://github.com/kuberack/platforms/blob/main/cert-manager/dns-ip.png  "dns ip entry")
 
  - Install kuard
    ```
