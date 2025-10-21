@@ -147,10 +147,11 @@ get_instance_ip () {
 
 # copy file to remote, and execute script
 # $1 = vm name
+# $2 = ssh file name
 bringup_k8s () {
     ip=$(get_instance_ip $1)
     scp -o "UserKnownHostsFile=/dev/null" k8s_pkg_install.sh shivkb@$ip:
-    ssh -o "UserKnownHostsFile=/dev/null" -i ~/.ssh/shivkube_gcp shivkb@$ip ./k8s_pkg_install.sh
+    ssh -o "UserKnownHostsFile=/dev/null" -i ~/.ssh/$2 shivkb@$ip ./k8s_pkg_install.sh
 }
 
 # create the VMs
@@ -170,6 +171,7 @@ gcloud compute instances create $1 --project=$2 --zone=us-central1-a --machine-t
 
 
 # create the vms
+ssh_file=gcp_shivkb
 pr=tubify-438815
 sa=753257145360-compute 
 im=ubuntu-minimal-2204-jammy-v20250530
@@ -188,13 +190,13 @@ retry_command check_vm_creation instance-1
 
 # bringup k8s on the master first, and then instance 1
 echo "Bringing up kubernetes on the nodes"
-bringup_k8s k8s-master
-bringup_k8s instance-1
-# bringup_k8s instance-2
-# bringup_k8s instance-3
+bringup_k8s k8s-master $ssh_file
+bringup_k8s instance-1 $ssh_file
+# bringup_k8s instance-2 $ssh_file
+# bringup_k8s instance-3 $ssh_file
 
 # Setup the kubeconfig file
 ip=$(get_instance_ip k8s-master)
 scp shivkb@$ip:.kube/config /home/hima/.kube/config
 yq  -i '.clusters[0].cluster.server="https://localhost:2222"' ~/.kube/config
-echo "ssh -i ~/.ssh/shivkube_gcp shivkb@$ip -L 2222:localhost:6443"
+echo "ssh -i ~/.ssh/$ssh_file shivkb@$ip -L 2222:localhost:6443"
