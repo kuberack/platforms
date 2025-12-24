@@ -35,6 +35,18 @@ Ref: https://cert-manager.io/docs/tutorials/acme/nginx-ingress/
  - Add the dns entry for the load balancer ip address 
    ![dns-ip](https://github.com/kuberack/platforms/blob/main/cert-manager/dns-ip.png  "dns ip entry")
 
+ - Check that that the dns entry resolves correctly
+   ```
+   $ sudo systemd-resolve --flush-caches
+   $ nslookup example.kuberack.net
+   Server:		127.0.0.53
+   Address:	127.0.0.53#53
+
+   Non-authoritative answer:
+   Name:	example.kuberack.net
+   Address: 34.58.216.38
+   ```
+
  - Install kuard
    ```
    kubectl apply -f https://raw.githubusercontent.com/cert-manager/website/master/content/docs/tutorials/acme/example/deployment.yaml
